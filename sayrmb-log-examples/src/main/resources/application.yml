@@ -1,0 +1,8 @@
+server:
+  port: 18088
+  servlet:
+    context-path: /sayhi
+sayhi:
+  log:
+    enable: true
+    consoleShow: true
