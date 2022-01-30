@@ -13,20 +13,20 @@ ShanHaiLog 为 Spring Boot 通用Log组件,主要包含以下能力：
 # 1.引入依赖
 
 ```xml
-<dependency>
-  <groupId>com.sayrmb.log</groupId>
-  <artifactId>sayrmb-log-spring-boot-starter</artifactId>
-  <version>1.0.1</version>
-</dependency>
+        <dependency>
+            <groupId>com.wangshanhai.log</groupId>
+            <artifactId>shanhai-log-spring-boot-starter</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 ```
 
 # 2.启用ShanHaiLog 组件
 
-使用注解@EnableSayHiLog 即可启用**LuWuLog**  组件
+使用注解@EnableShanHaiLog 即可启用**LuWuLog**  组件
 
 ```java
 @Configuration
-@EnableSayHiLog
+@EnableShanHaiLog
 public class LogConfig {
 }
 
@@ -149,7 +149,7 @@ public interface RequestLogService {
 在开发阶段，可以考虑打开API LOG 控制台输出查看相关报文。生产环境在自定义存储实现时，也可以考虑打开控制台输出，做日志存储灾备。
 
 ```
-sayhi.log.consoleShow=true
+shanhai.log.consoleShow=true
 ```
 
 # 9.标准化日志对象参数说明(RequestLogInfo)
