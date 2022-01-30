@@ -22,7 +22,7 @@ ShanHaiLog 为 Spring Boot 通用Log组件,主要包含以下能力：
 
 # 2.启用ShanHaiLog 组件
 
-使用注解@EnableShanHaiLog 即可启用**LuWuLog**  组件
+使用注解@EnableShanHaiLog 即可启用ShanHaiLog 组件
 
 ```java
 @Configuration
