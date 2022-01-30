@@ -1,0 +1,7 @@
+server:
+  port: 18088
+  servlet:
+    context-path: /shanhai
+shanhai:
+  log:
+    consoleShow: true
