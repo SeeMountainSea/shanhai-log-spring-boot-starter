@@ -9,11 +9,11 @@
         <version>2.2.13.RELEASE</version>
         <relativePath/>
     </parent>
-    <groupId>com.sayrmb.log</groupId>
-    <artifactId>sayrmb-log-parent</artifactId>
+    <groupId>com.wangshanhai.log</groupId>
+    <artifactId>shanhai-log-parent</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
-    <name>sayrmb-log-parent</name>
+    <name>shanhai-log-parent</name>
     <properties>
         <lombok.version>1.16.14</lombok.version>
     </properties>
@@ -26,16 +26,16 @@
     </licenses>
 
     <scm>
-        <url>https://gitee.com/china-glod-line/sayrmblog-spring-boot-starter</url>
-        <connection>https://gitee.com/china-glod-line/sayrmblog-spring-boot-starter.git</connection>
-        <developerConnection>https://gitee.com/china-glod-line/sayrmblog-spring-boot-starter</developerConnection>
+        <url>https://github.com/SeeMountainSea/shanhai-log-spring-boot-starter</url>
+        <connection>https://github.com/SeeMountainSea/shanhai-log-spring-boot-starter.git</connection>
+        <developerConnection>https://github.com/SeeMountainSea/shanhai-log-spring-boot-starter</developerConnection>
     </scm>
 
     <developers>
         <developer>
             <name>shmily_zgs</name>
-            <email>2375026780@qq.com</email>
-            <url>https://gitee.com/china-glod-line/sayrmblog-spring-boot-starter</url>
+            <email>gold.robot@88.com</email>
+            <url>https://github.com/SeeMountainSea/shanhai-log-spring-boot-starter</url>
         </developer>
     </developers>
 
@@ -46,7 +46,7 @@
         </snapshotRepository>
     </distributionManagement>
     <modules>
-        <module>sayrmb-log-spring-boot-starter</module>
+        <module>shanhai-log-spring-boot-starter</module>
     </modules>
     <dependencies>
         <dependency>
