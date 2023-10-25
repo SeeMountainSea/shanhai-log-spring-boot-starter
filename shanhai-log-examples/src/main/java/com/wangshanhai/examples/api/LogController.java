@@ -2,6 +2,7 @@ package com.wangshanhai.examples.api;
 
 import com.shanhai.log.annotation.RequestLog;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -18,5 +19,11 @@ public class LogController {
     @ResponseBody
     public String logshow(@RequestParam("currentUser") String currentUser, @RequestParam("size") Long size, @RequestParam("current")Long current){
        return "success";
+    }
+    @RequestLog(module = "Order", message = "分页查询订单-Body")
+    @RequestMapping(value = "/body")
+    @ResponseBody
+    public String logshow(@RequestBody String body){
+        return "success";
     }
 }

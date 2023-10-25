@@ -133,15 +133,9 @@ public class RequestLogAspect {
         String reqInfo="-";
         Map<String, String> rtnMap = converMap(request.getParameterMap());
         if(rtnMap!=null&&rtnMap.size()>0){
-            reqInfo= "[form-data]"+JSONObject.toJSONString(rtnMap);
-        }else {
-            //获取请求参数
-            Object[] args = point.getArgs();
-            if(args.length>0&&"POST".equals(requestLogInfo.getHttpMethod())){
-                reqInfo="[body]"+JSONUtil.toJsonStr(args[0]);
-            }
+            reqInfo=JSONObject.toJSONString(rtnMap);
         }
-        requestLogInfo.setReqInfo(reqInfo);
+        requestLogInfo.setReqInfo(JSONObject.toJSONString(reqInfo));
         requestLogInfo.setExtLogInfo(requestLogService.getExtLogInfo(request));
         requestLogService.saveLog(requestLogInfo);
         if (consoleShow) {
@@ -181,8 +175,15 @@ public class RequestLogAspect {
     private Map<String, String> converMap(Map<String, String[]> paramMap) {
         Map<String, String> rtnMap = new HashMap<String, String>();
         for (String key : paramMap.keySet()) {
-            String[] values=paramMap.get(key);
-            rtnMap.put(key, String.join(",",values));
+            try{
+                JSONObject reqInfo= JSONObject.parseObject(key);
+                for(String rkey:reqInfo.keySet()){
+                    rtnMap.put(rkey, reqInfo.getString(rkey));
+                }
+            }catch (Exception e){
+                String[] values=paramMap.get(key);
+                rtnMap.put(key, String.join(",",values));
+            }
         }
         return rtnMap;
     }

@@ -24,7 +24,7 @@
         <dependency>
             <groupId>com.wangshanhai.log</groupId>
             <artifactId>shanhai-log-spring-boot-starter</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
     </dependencies>
 
