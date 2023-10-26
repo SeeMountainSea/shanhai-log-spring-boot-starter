@@ -1,6 +1,8 @@
 package com.wangshanhai.examples.api;
 
 import com.shanhai.log.annotation.RequestLog;
+import com.wangshanhai.examples.service.ManyParamService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +12,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 @RequestMapping("/api")
 public class LogController {
+    @Autowired
+    private ManyParamService manyParamService;
     /**
      * 文件上传测试样例
      * @return
@@ -24,6 +28,14 @@ public class LogController {
     @RequestMapping(value = "/body")
     @ResponseBody
     public String logshow(@RequestBody String body){
+        return "success";
+    }
+
+    @RequestLog(module = "Order", message = "多入参测试")
+    @RequestMapping(value = "/many")
+    @ResponseBody
+    public String many(@RequestBody String body){
+        manyParamService.test("参数首位",body);
         return "success";
     }
 }

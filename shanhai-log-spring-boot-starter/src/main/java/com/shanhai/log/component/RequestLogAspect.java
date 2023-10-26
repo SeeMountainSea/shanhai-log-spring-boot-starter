@@ -155,7 +155,17 @@ public class RequestLogAspect {
                 ||request.getContentType().toLowerCase(Locale.ENGLISH).contains("application/xml"))){
             Object[] args = point.getArgs();
             if(args!=null&&args.length>0){
-                postData.put("bodyParam",String.valueOf(args[0]));
+                if(args.length==1){
+                    postData.put("bodyParam",String.valueOf(args[0]));
+                }else{
+                    Map<String,Object> bodyParams=new HashMap<>();
+                    String[] parameterNames=  ((MethodSignature) point.getSignature()).getParameterNames();
+                    for(int i=0;i< args.length;i++){
+                        bodyParams.put(parameterNames[i],args[i]);
+                    }
+                    postData.put("bodyParam",bodyParams);
+                }
+
             }else{
                 postData.put("bodyParam","-");
             }
