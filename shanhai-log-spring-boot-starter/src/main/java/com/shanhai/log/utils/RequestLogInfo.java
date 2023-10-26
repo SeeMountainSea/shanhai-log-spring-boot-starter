@@ -84,6 +84,10 @@ public class RequestLogInfo implements Serializable {
      */
     private String httpMethod;
     /**
+     * HTTP请求内容类型
+     */
+    private String contentType;
+    /**
      * 自定义扩展日志信息
      */
     private Map<String,Object> extLogInfo;

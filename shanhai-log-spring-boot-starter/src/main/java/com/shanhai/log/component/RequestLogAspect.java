@@ -1,6 +1,7 @@
 package com.shanhai.log.component;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.shanhai.log.annotation.RequestLog;
@@ -35,6 +36,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -109,6 +111,7 @@ public class RequestLogAspect {
         requestLogInfo.setReqSourceIp(requestLogService.getReqSourceIp(request));
         requestLogInfo.setReqUrl(request.getRequestURI());
         requestLogInfo.setHttpMethod(request.getMethod());
+        requestLogInfo.setContentType(request.getContentType());
         if (socLog.message().contains("#{")) {
             requestLogInfo.setMessage(executeTemplate(socLog.message(), point));
         } else {
@@ -130,12 +133,37 @@ public class RequestLogAspect {
             requestLogInfo.setRespInfo(writer.toString());
             requestLogInfo.setRespStatusCode(500);
         }
-        String reqInfo="-";
         Map<String, String> rtnMap = converMap(request.getParameterMap());
-        if(rtnMap!=null&&rtnMap.size()>0){
-            reqInfo=JSONObject.toJSONString(rtnMap);
+        JSONObject postData=new JSONObject();
+        if(rtnMap.size()>0){
+            if("GET".equals(request.getMethod())){
+                requestLogInfo.setReqInfo(JSONObject.toJSONString(rtnMap));
+            }
+            if("POST".equals(request.getMethod())){
+               if(request.getContentType().toLowerCase(Locale.ENGLISH).contains("multipart/form-data")
+                       ||request.getContentType().toLowerCase(Locale.ENGLISH).contains("application/x-www-form-urlencoded")){
+                   requestLogInfo.setReqInfo(JSONObject.toJSONString(rtnMap));
+               }
+               //适配post json类型请求，但URL包含参数的情况
+               if(request.getContentType().toLowerCase(Locale.ENGLISH).contains("application/json")){
+                   postData.put("urlParam",JSONObject.toJSONString(rtnMap));
+               }
+            }
         }
-        requestLogInfo.setReqInfo(JSONObject.toJSONString(reqInfo));
+        if("POST".equals(request.getMethod())&&(
+                request.getContentType().toLowerCase(Locale.ENGLISH).contains("application/json")
+                ||request.getContentType().toLowerCase(Locale.ENGLISH).contains("application/xml"))){
+            Object[] args = point.getArgs();
+            if(args!=null&&args.length>0){
+                postData.put("bodyParam",String.valueOf(args[0]));
+            }else{
+                postData.put("bodyParam","-");
+            }
+            requestLogInfo.setReqInfo(postData.toJSONString());
+        }
+        if(StrUtil.isBlank(requestLogInfo.getReqInfo())){
+            requestLogInfo.setReqInfo("-");
+        }
         requestLogInfo.setExtLogInfo(requestLogService.getExtLogInfo(request));
         requestLogService.saveLog(requestLogInfo);
         if (consoleShow) {

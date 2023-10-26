@@ -5,5 +5,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableShanHaiLog
+//@EnableShanHaiGuard
 public class LogConfig {
 }

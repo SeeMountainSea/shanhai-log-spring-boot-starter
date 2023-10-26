@@ -5,11 +5,11 @@
     <parent>
         <artifactId>shanhai-log-parent</artifactId>
         <groupId>com.wangshanhai.log</groupId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>shanhai-log-spring-boot-starter</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <name>shanhai-log-spring-boot-starter</name>
     <description>山海Log - 一款基于SpringBoot的业务日志记录组件</description>
     <properties>
