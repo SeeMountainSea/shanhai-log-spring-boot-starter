@@ -31,13 +31,12 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 通用日志处理(支持Spel)
@@ -108,6 +107,7 @@ public class RequestLogAspect {
         requestLogInfo.setRespTime(DateUtil.date(endTime));
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = requestAttributes.getRequest();
+
         requestLogInfo.setReqSourceIp(requestLogService.getReqSourceIp(request));
         requestLogInfo.setReqUrl(request.getRequestURI());
         requestLogInfo.setHttpMethod(request.getMethod());
@@ -123,7 +123,11 @@ public class RequestLogAspect {
             requestLogInfo.setCurrentUser(requestLogService.getCurrentUser(request));
         }
         if (respContent != null) {
-            requestLogInfo.setRespInfo(JSONUtil.toJsonStr(respContent));
+            if(!socLog.fileDownload()){
+                requestLogInfo.setRespInfo(JSONUtil.toJsonStr(respContent));
+            }else{
+                requestLogInfo.setRespInfo("File Download");
+            }
             requestLogInfo.setRespStatusCode(200);
         }
         if (ex != null) {
@@ -170,6 +174,41 @@ public class RequestLogAspect {
                 postData.put("bodyParam","-");
             }
             requestLogInfo.setReqInfo(postData.toJSONString());
+        }
+        try {
+            if(socLog.fileUpload()){
+                Collection<Part> parts= request.getParts();
+                if(parts!=null && parts.size()>0){
+                    Map<String, List<String>> fileReqInfo=new HashMap<>();
+                    for(Part p:parts){
+                        if(!StrUtil.isBlank(p.getSubmittedFileName())){
+                            String k=p.getName();
+                            List<String> files= fileReqInfo.get(k);
+                            if(files!=null){
+                                files.add(p.getSubmittedFileName());
+                                fileReqInfo.put(k,files);
+                            }else{
+                                files=new ArrayList<>();
+                                files.add(p.getSubmittedFileName());
+                                fileReqInfo.put(k,files);
+                            }
+                        }
+                    }
+                    if(fileReqInfo.keySet().size()>0){
+                        requestLogInfo.setFileReqInfo(JSONObject.toJSONString(fileReqInfo));
+                        requestLogInfo.setFileUploadRequest(true);
+                    }else{
+                        requestLogInfo.setFileUploadRequest(false);
+                        requestLogInfo.setFileReqInfo("-");
+                    }
+                }
+            }else{
+                requestLogInfo.setFileUploadRequest(false);
+                requestLogInfo.setFileReqInfo("-");
+            }
+        }catch (Exception e){
+            requestLogInfo.setFileUploadRequest(false);
+            requestLogInfo.setFileReqInfo("-");
         }
         if(StrUtil.isBlank(requestLogInfo.getReqInfo())){
             requestLogInfo.setReqInfo("-");

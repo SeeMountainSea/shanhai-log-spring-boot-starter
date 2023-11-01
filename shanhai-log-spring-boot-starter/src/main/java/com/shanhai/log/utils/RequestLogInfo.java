@@ -88,6 +88,14 @@ public class RequestLogInfo implements Serializable {
      */
     private String contentType;
     /**
+     * 是否未上传文件请求
+     */
+    private Boolean fileUploadRequest;
+    /**
+     * 文件上传清单
+     */
+    private String fileReqInfo;
+    /**
      * 自定义扩展日志信息
      */
     private Map<String,Object> extLogInfo;

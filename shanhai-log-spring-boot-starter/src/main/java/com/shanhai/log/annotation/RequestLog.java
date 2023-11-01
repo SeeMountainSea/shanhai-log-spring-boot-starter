@@ -4,6 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * 系统日志注解
+ * @author Shanhai
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -29,4 +30,15 @@ public @interface RequestLog {
      * @return
      */
     String currentUser() default "";
+
+    /**
+     * 本次请求是否为文件上传请求
+     * @return
+     */
+    boolean fileUpload() default false;
+    /**
+     * 本次请求是否为文件下载
+     * @return
+     */
+    boolean fileDownload() default false;
 }
