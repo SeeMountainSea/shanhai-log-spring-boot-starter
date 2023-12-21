@@ -148,8 +148,9 @@ public class RequestLogAspect {
                        ||request.getContentType().toLowerCase(Locale.ENGLISH).contains("application/x-www-form-urlencoded")){
                    requestLogInfo.setReqInfo(JSONObject.toJSONString(rtnMap));
                }
-               //适配post json类型请求，但URL包含参数的情况
-               if(request.getContentType().toLowerCase(Locale.ENGLISH).contains("application/json")){
+               //适配post json|xml类型请求，但URL包含参数的情况
+               if(request.getContentType().toLowerCase(Locale.ENGLISH).contains("application/json")
+                       ||request.getContentType().toLowerCase(Locale.ENGLISH).contains("application/xml")){
                    postData.put("urlParam",JSONObject.toJSONString(rtnMap));
                }
             }
@@ -160,14 +161,22 @@ public class RequestLogAspect {
             Object[] args = point.getArgs();
             if(args!=null&&args.length>0){
                 if(args.length==1){
-                    postData.put("bodyParam",String.valueOf(args[0]));
+                    if(request.getContentType().toLowerCase(Locale.ENGLISH).contains("application/json")){
+                        postData.put("bodyParam",JSONObject.toJSONString(String.valueOf(args[0])));
+                    }else{
+                        postData.put("bodyParam",String.valueOf(args[0]));
+                    }
                 }else{
                     Map<String,Object> bodyParams=new HashMap<>();
                     String[] parameterNames=  ((MethodSignature) point.getSignature()).getParameterNames();
                     for(int i=0;i< args.length;i++){
                         bodyParams.put(parameterNames[i],args[i]);
                     }
-                    postData.put("bodyParam",bodyParams);
+                    if(request.getContentType().toLowerCase(Locale.ENGLISH).contains("application/json")){
+                        postData.put("bodyParam",JSONObject.toJSONString(bodyParams));
+                    }else{
+                        postData.put("bodyParam",bodyParams);
+                    }
                 }
 
             }else{
