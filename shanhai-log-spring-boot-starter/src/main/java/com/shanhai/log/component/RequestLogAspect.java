@@ -109,6 +109,7 @@ public class RequestLogAspect {
         HttpServletRequest request = requestAttributes.getRequest();
 
         requestLogInfo.setReqSourceIp(requestLogService.getReqSourceIp(request));
+        requestLogInfo.setAgentInfo(request.getHeader("User-Agent"));
         requestLogInfo.setReqUrl(request.getRequestURI());
         requestLogInfo.setHttpMethod(request.getMethod());
         requestLogInfo.setContentType(request.getContentType());
