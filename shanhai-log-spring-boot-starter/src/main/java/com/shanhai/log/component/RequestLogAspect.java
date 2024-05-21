@@ -40,6 +40,7 @@ import java.util.*;
 
 /**
  * 通用日志处理(支持Spel)
+ * @author Shmily
  */
 @Aspect
 @Configuration
@@ -156,13 +157,17 @@ public class RequestLogAspect {
                }
             }
         }
-        if("POST".equals(request.getMethod())&&(
-                request.getContentType().toLowerCase(Locale.ENGLISH).contains("application/json")
-                ||request.getContentType().toLowerCase(Locale.ENGLISH).contains("application/xml"))){
+        String contentType=request.getContentType();
+        if(!StrUtil.isBlank(contentType)){
+            contentType=contentType.toLowerCase(Locale.ENGLISH);
+        }else{
+            contentType="";
+        }
+        if("POST".equals(request.getMethod())&&(contentType.contains("application/json") ||contentType.contains("application/xml"))){
             Object[] args = point.getArgs();
             if(args!=null&&args.length>0){
                 if(args.length==1){
-                    if(request.getContentType().toLowerCase(Locale.ENGLISH).contains("application/json")){
+                    if(contentType.contains("application/json")){
                         postData.put("bodyParam",JSONObject.toJSONString(String.valueOf(args[0])));
                     }else{
                         postData.put("bodyParam",String.valueOf(args[0]));
@@ -173,7 +178,7 @@ public class RequestLogAspect {
                     for(int i=0;i< args.length;i++){
                         bodyParams.put(parameterNames[i],args[i]);
                     }
-                    if(request.getContentType().toLowerCase(Locale.ENGLISH).contains("application/json")){
+                    if(contentType.contains("application/json")){
                         postData.put("bodyParam",JSONObject.toJSONString(bodyParams));
                     }else{
                         postData.put("bodyParam",bodyParams);
