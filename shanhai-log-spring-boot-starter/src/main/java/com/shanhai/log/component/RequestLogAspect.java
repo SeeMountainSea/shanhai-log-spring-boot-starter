@@ -108,12 +108,17 @@ public class RequestLogAspect {
         requestLogInfo.setRespTime(DateUtil.date(endTime));
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = requestAttributes.getRequest();
-
+        String contentType=request.getContentType();
+        if(!StrUtil.isBlank(contentType)){
+            contentType=contentType.toLowerCase(Locale.ENGLISH);
+        }else{
+            contentType="";
+        }
         requestLogInfo.setReqSourceIp(requestLogService.getReqSourceIp(request));
         requestLogInfo.setAgentInfo(request.getHeader("User-Agent"));
         requestLogInfo.setReqUrl(request.getRequestURI());
         requestLogInfo.setHttpMethod(request.getMethod());
-        requestLogInfo.setContentType(request.getContentType());
+        requestLogInfo.setContentType(contentType);
         if (socLog.message().contains("#{")) {
             requestLogInfo.setMessage(executeTemplate(socLog.message(), point));
         } else {
@@ -146,31 +151,41 @@ public class RequestLogAspect {
                 requestLogInfo.setReqInfo(JSONObject.toJSONString(rtnMap));
             }
             if("POST".equals(request.getMethod())){
-               if(request.getContentType().toLowerCase(Locale.ENGLISH).contains("multipart/form-data")
-                       ||request.getContentType().toLowerCase(Locale.ENGLISH).contains("application/x-www-form-urlencoded")){
-                   requestLogInfo.setReqInfo(JSONObject.toJSONString(rtnMap));
+               if(contentType.contains("multipart/form-data") ||contentType.contains("application/x-www-form-urlencoded")){
+                   try{
+                       requestLogInfo.setReqInfo(JSONObject.toJSONString(rtnMap));
+                   }catch (Exception e){
+                       requestLogInfo.setReqInfo("ContentType is error,no find log!");
+                   }
+
                }
                //适配post json|xml类型请求，但URL包含参数的情况
-               if(request.getContentType().toLowerCase(Locale.ENGLISH).contains("application/json")
-                       ||request.getContentType().toLowerCase(Locale.ENGLISH).contains("application/xml")){
-                   postData.put("urlParam",JSONObject.toJSONString(rtnMap));
+               if(contentType.contains("application/json") ||contentType.contains("application/xml")){
+                   try{
+                       postData.put("urlParam",JSONObject.toJSONString(rtnMap));
+                   }catch (Exception e){
+                       postData.put("urlParam","ContentType is error,no find log!");
+                   }
                }
             }
         }
-        String contentType=request.getContentType();
-        if(!StrUtil.isBlank(contentType)){
-            contentType=contentType.toLowerCase(Locale.ENGLISH);
-        }else{
-            contentType="";
-        }
+
         if("POST".equals(request.getMethod())&&(contentType.contains("application/json") ||contentType.contains("application/xml"))){
             Object[] args = point.getArgs();
             if(args!=null&&args.length>0){
                 if(args.length==1){
                     if(contentType.contains("application/json")){
-                        postData.put("bodyParam",JSONObject.toJSONString(String.valueOf(args[0])));
+                        try{
+                            postData.put("bodyParam",JSONObject.toJSONString(String.valueOf(args[0])));
+                        }catch (Exception e){
+                            postData.put("bodyParam","ContentType is error,no find log!");
+                        }
                     }else{
-                        postData.put("bodyParam",String.valueOf(args[0]));
+                        try{
+                            postData.put("bodyParam",String.valueOf(args[0]));
+                        }catch (Exception e){
+                            postData.put("bodyParam","ContentType is error,no find log!");
+                        }
                     }
                 }else{
                     Map<String,Object> bodyParams=new HashMap<>();
@@ -179,7 +194,11 @@ public class RequestLogAspect {
                         bodyParams.put(parameterNames[i],args[i]);
                     }
                     if(contentType.contains("application/json")){
-                        postData.put("bodyParam",JSONObject.toJSONString(bodyParams));
+                        try{
+                            postData.put("bodyParam",JSONObject.toJSONString(bodyParams));
+                        }catch (Exception e){
+                            postData.put("bodyParam","ContentType is error,no find log!");
+                        }
                     }else{
                         postData.put("bodyParam",bodyParams);
                     }
