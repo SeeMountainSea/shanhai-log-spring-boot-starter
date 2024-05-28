@@ -31,6 +31,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -176,7 +177,9 @@ public class RequestLogAspect {
                 if(args.length==1){
                     if(contentType.contains("application/json")){
                         try{
-                            postData.put("bodyParam",JSONObject.toJSONString(String.valueOf(args[0])));
+                            if(!(args[0] instanceof HttpServletRequest || args[0] instanceof HttpServletResponse)){
+                                postData.put("bodyParam",JSONObject.toJSONString(String.valueOf(args[0])));
+                            }
                         }catch (Exception e){
                             postData.put("bodyParam","ContentType is error,no find log!");
                         }
@@ -191,6 +194,10 @@ public class RequestLogAspect {
                     Map<String,Object> bodyParams=new HashMap<>();
                     String[] parameterNames=  ((MethodSignature) point.getSignature()).getParameterNames();
                     for(int i=0;i< args.length;i++){
+                        if(args[i] instanceof HttpServletRequest || args[i] instanceof HttpServletResponse
+                                ||rtnMap.containsKey(parameterNames[i])){
+                           continue;
+                        }
                         bodyParams.put(parameterNames[i],args[i]);
                     }
                     if(contentType.contains("application/json")){

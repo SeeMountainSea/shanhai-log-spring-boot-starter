@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -26,7 +27,7 @@ public class FileController {
     @PostMapping("/upload")
     @ResponseBody
     @RequestLog(message = "简单文件上传",fileUpload = true)
-    public String upload(@RequestParam(value = "file", required = true) MultipartFile [] file, String f1) {
+    public String upload(HttpServletRequest request, @RequestParam(value = "file", required = true) MultipartFile [] file, String f1) {
         return f1;
     }
 
