@@ -1,5 +1,6 @@
 package com.wangshanhai.examples.api;
 
+import cn.hutool.system.UserInfo;
 import com.shanhai.log.annotation.RequestLog;
 import com.wangshanhai.examples.service.ManyParamService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class LogController {
     @RequestLog(module = "Order", message = "多入参测试")
     @RequestMapping(value = "/many")
     @ResponseBody
-    public String many(@RequestBody String body){
+    public String many(@RequestBody String body, UserInfo userInfo,HttpServletRequest request,HttpServletResponse response){
         manyParamService.test("参数首位",body);
         return "success";
     }

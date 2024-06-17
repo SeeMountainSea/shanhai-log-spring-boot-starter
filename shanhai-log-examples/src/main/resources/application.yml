@@ -5,5 +5,5 @@ server:
 shanhai:
   log:
     consoleShow: true
-  decodebody:
-    enable: true #启用组件
+    ignore-request-params:
+      - cn.hutool.system.UserInfo
