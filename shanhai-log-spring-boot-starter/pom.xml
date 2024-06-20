@@ -5,7 +5,7 @@
     <parent>
         <artifactId>shanhai-log-parent</artifactId>
         <groupId>com.wangshanhai.log</groupId>
-        <version>1.0.6</version>
+        <version>1.1.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>shanhai-log-spring-boot-starter</artifactId>
