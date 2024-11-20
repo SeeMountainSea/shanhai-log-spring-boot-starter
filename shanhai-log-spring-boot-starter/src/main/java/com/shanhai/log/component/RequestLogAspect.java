@@ -79,6 +79,11 @@ public class RequestLogAspect {
         long beginTime = System.currentTimeMillis();
         //执行方法
         Object result = joinPoint.proceed();
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = requestAttributes.getRequest();
+        if(shanHaiLogConfig.getIgnoreRequestUri().contains(request.getRequestURI())){
+            return result;
+        }
         long endTime = System.currentTimeMillis();
         if(result!=null){
             buildLog(joinPoint, beginTime, endTime, result, null);
