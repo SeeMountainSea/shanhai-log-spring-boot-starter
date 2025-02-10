@@ -28,7 +28,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.StandardReflectionParameterNameDiscoverer;
+import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.common.TemplateParserContext;
@@ -302,7 +302,7 @@ public class RequestLogAspect {
     private String executeTemplate(String message, JoinPoint joinPoint) {
         try {
             ExpressionParser parser = new SpelExpressionParser();
-            StandardReflectionParameterNameDiscoverer discoverer = new StandardReflectionParameterNameDiscoverer();
+            LocalVariableTableParameterNameDiscoverer discoverer = new LocalVariableTableParameterNameDiscoverer();
             Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
             String[] params = discoverer.getParameterNames(method);
             Object[] args = joinPoint.getArgs();
