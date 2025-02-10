@@ -1,0 +1,9 @@
+server:
+  port: 18086
+  servlet:
+    context-path: /shanhai
+shanhai:
+  log:
+    consoleShow: true
+    ignore-request-params:
+      - cn.hutool.system.UserInfo

@@ -8,14 +8,14 @@
         <version>1.1.4</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>shanhai-log-spring-boot-starter</artifactId>
-    <version>1.1.4</version>
-    <name>shanhai-log-spring-boot-starter</name>
-    <description>山海Log - 一款基于SpringBoot2的业务日志记录组件</description>
+    <artifactId>shanhai-log-spring-boot3-starter</artifactId>
+    <version>1.0.0</version>
+    <name>shanhai-log-spring-boot3-starter</name>
+    <description>山海Log - 一款基于SpringBoot3的业务日志记录组件</description>
     <properties>
-        <spring-boot.version>2.7.18</spring-boot.version>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <spring-boot3.version>3.1.4</spring-boot3.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -23,7 +23,7 @@
                 <!-- Import dependency management from Spring Boot -->
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
+                <version>${spring-boot3.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

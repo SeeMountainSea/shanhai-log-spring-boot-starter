@@ -11,6 +11,9 @@ import com.shanhai.log.service.RequestLogService;
 import com.shanhai.log.service.impl.DefaultRequestLogService;
 import com.shanhai.log.utils.Logger;
 import com.shanhai.log.utils.RequestLogInfo;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -34,9 +37,6 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -83,6 +83,7 @@ public class RequestLogAspect {
         //执行方法
         Object result = joinPoint.proceed();
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        assert requestAttributes != null;
         HttpServletRequest request = requestAttributes.getRequest();
         if(shanHaiLogConfig.getIgnoreRequestUri().contains(request.getRequestURI())){
             return result;
@@ -120,6 +121,7 @@ public class RequestLogAspect {
         requestLogInfo.setReqTime(DateUtil.date(beginTime));
         requestLogInfo.setRespTime(DateUtil.date(endTime));
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        assert requestAttributes != null;
         HttpServletRequest request = requestAttributes.getRequest();
         String contentType=request.getContentType();
         if(!StrUtil.isBlank(contentType)){
@@ -283,6 +285,7 @@ public class RequestLogAspect {
         }else{
             requestLogInfo.setCost(-1L);
         }
+
         requestLogService.saveLog(requestLogInfo);
         if (shanHaiLogConfig.isConsoleShow()) {
             Logger.info("[RequestLog]-{}", JSONObject.toJSONString(requestLogInfo));

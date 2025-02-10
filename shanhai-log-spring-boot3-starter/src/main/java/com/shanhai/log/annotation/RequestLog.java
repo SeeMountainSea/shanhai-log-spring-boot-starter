@@ -36,14 +36,15 @@ public @interface RequestLog {
      * @return
      */
     boolean fileUpload() default false;
-    /**
-     * 本次请求是否为文件下载
-     * @return
-     */
-    boolean fileDownload() default false;
+
     /**
      * 本次请求忽略响应报文
      * @return
      */
     boolean ignoreResponse() default false;
+    /**
+     * 本次请求是否为文件下载
+     * @return
+     */
+    boolean fileDownload() default false;
 }

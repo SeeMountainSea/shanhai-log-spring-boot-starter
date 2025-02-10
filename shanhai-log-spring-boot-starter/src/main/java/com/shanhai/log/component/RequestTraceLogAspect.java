@@ -1,5 +1,6 @@
 package com.shanhai.log.component;
 
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -22,6 +23,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -56,6 +58,7 @@ public class RequestTraceLogAspect {
         return new DefaultRequestLogService(applicationName,applicationPort);
     };
     @Autowired
+    @Lazy
     private RequestLogService requestLogService;
     @Pointcut("@annotation(org.springframework.web.bind.annotation.GetMapping)" +
             "||@annotation(org.springframework.web.bind.annotation.PostMapping)" +
@@ -216,6 +219,13 @@ public class RequestTraceLogAspect {
             requestLogInfo.setReqInfo("-");
         }
         requestLogInfo.setExtLogInfo(requestLogService.getExtLogInfo(request));
+        if(requestLogInfo.getReqTime()!=null
+                &&requestLogInfo.getRespTime()!=null){
+            requestLogInfo.setCost(DateUtil.between(requestLogInfo.getReqTime(),
+                    requestLogInfo.getRespTime(), DateUnit.MS));
+        }else{
+            requestLogInfo.setCost(-1L);
+        }
         requestLogService.saveLog(requestLogInfo);
         if (shanHaiLogConfig.isConsoleShow()) {
             Logger.info("[RequestLog]-{}", JSONObject.toJSONString(requestLogInfo));

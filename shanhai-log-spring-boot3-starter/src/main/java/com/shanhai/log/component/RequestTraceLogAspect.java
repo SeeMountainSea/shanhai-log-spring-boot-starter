@@ -5,12 +5,13 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
-import com.shanhai.log.annotation.RequestLog;
 import com.shanhai.log.config.ShanHaiLogConfig;
 import com.shanhai.log.service.RequestLogService;
 import com.shanhai.log.service.impl.DefaultRequestLogService;
 import com.shanhai.log.utils.Logger;
 import com.shanhai.log.utils.RequestLogInfo;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -25,32 +26,26 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.StandardReflectionParameterNameDiscoverer;
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.common.TemplateParserContext;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
- * 通用日志处理(支持Spel)
+ * 全局跟踪日志处理
  * @author Shmily
  */
 @Aspect
 @Configuration
 @EnableConfigurationProperties(ShanHaiLogConfig.class)
-public class RequestLogAspect {
+public class RequestTraceLogAspect {
+
     @Value("${spring.application.name:XXX}")
     private String applicationName;
     @Value("${server.port:8080}")
@@ -62,17 +57,15 @@ public class RequestLogAspect {
     public RequestLogService generateDefaultRequestLogService() {
         return new DefaultRequestLogService(applicationName,applicationPort);
     };
-
     @Autowired
     @Lazy
     private RequestLogService requestLogService;
-    /**
-     * 是否将日志打印控制台
-     */
-    @Value("${shanhai.log.consoleShow:false}")
-    private boolean consoleShow;
-
-    @Pointcut("@annotation(com.shanhai.log.annotation.RequestLog)")
+    @Pointcut("@annotation(org.springframework.web.bind.annotation.GetMapping)" +
+            "||@annotation(org.springframework.web.bind.annotation.PostMapping)" +
+            "||@annotation(org.springframework.web.bind.annotation.RequestMapping)" +
+            "||@annotation(org.springframework.web.bind.annotation.PutMapping)" +
+            "||@annotation(org.springframework.web.bind.annotation.DeleteMapping)" +
+            "||@annotation(org.springframework.web.bind.annotation.PathVariable)")
     public void pointCut() {
 
     }
@@ -82,11 +75,6 @@ public class RequestLogAspect {
         long beginTime = System.currentTimeMillis();
         //执行方法
         Object result = joinPoint.proceed();
-        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = requestAttributes.getRequest();
-        if(shanHaiLogConfig.getIgnoreRequestUri().contains(request.getRequestURI())){
-            return result;
-        }
         long endTime = System.currentTimeMillis();
         if(result!=null){
             buildLog(joinPoint, beginTime, endTime, result, null);
@@ -114,12 +102,12 @@ public class RequestLogAspect {
         RequestLogInfo requestLogInfo = new RequestLogInfo();
         MethodSignature signature = (MethodSignature) point.getSignature();
         Method method = signature.getMethod();
-        RequestLog socLog = method.getAnnotation(RequestLog.class);
-        requestLogInfo.setModule(socLog.module());
-        requestLogInfo.setLevel(socLog.level());
+        requestLogInfo.setModule("Project_All");
+        requestLogInfo.setLevel("Level_All");
         requestLogInfo.setReqTime(DateUtil.date(beginTime));
         requestLogInfo.setRespTime(DateUtil.date(endTime));
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        assert requestAttributes != null;
         HttpServletRequest request = requestAttributes.getRequest();
         String contentType=request.getContentType();
         if(!StrUtil.isBlank(contentType)){
@@ -132,25 +120,13 @@ public class RequestLogAspect {
         requestLogInfo.setReqUrl(request.getRequestURI());
         requestLogInfo.setHttpMethod(request.getMethod());
         requestLogInfo.setContentType(contentType);
-        if (socLog.message().contains("#{")) {
-            requestLogInfo.setMessage(executeTemplate(socLog.message(), point));
-        } else {
-            requestLogInfo.setMessage(socLog.message());
-        }
-        if (socLog.currentUser().contains("#{")) {
-            requestLogInfo.setCurrentUser(executeTemplate(socLog.currentUser(), point));
-        } else {
-            requestLogInfo.setCurrentUser(requestLogService.getCurrentUser(request));
-        }
+        requestLogInfo.setMessage("-");
+        requestLogInfo.setCurrentUser(requestLogService.getCurrentUser(request));
         if (respContent != null) {
-            if(!socLog.fileDownload()){
-                try{
-                    requestLogInfo.setRespInfo(JSONUtil.toJsonStr(respContent));
-                }catch (Exception e){
-                    requestLogInfo.setRespInfo(String.valueOf(respContent));
-                }
-            }else{
-                requestLogInfo.setRespInfo("File Download");
+            try {
+                requestLogInfo.setRespInfo(JSONUtil.toJsonStr(respContent));
+            }catch (Exception e){
+                requestLogInfo.setRespInfo(String.valueOf(respContent));
             }
             requestLogInfo.setRespStatusCode(200);
         }
@@ -168,22 +144,22 @@ public class RequestLogAspect {
                 requestLogInfo.setReqInfo(JSONObject.toJSONString(rtnMap));
             }
             if("POST".equals(request.getMethod())){
-               if(contentType.contains("multipart/form-data") ||contentType.contains("application/x-www-form-urlencoded")){
-                   try{
-                       requestLogInfo.setReqInfo(JSONObject.toJSONString(rtnMap));
-                   }catch (Exception e){
-                       requestLogInfo.setReqInfo("ContentType is error,no find log!");
-                   }
+                if(contentType.contains("multipart/form-data") ||contentType.contains("application/x-www-form-urlencoded")){
+                    try{
+                        requestLogInfo.setReqInfo(JSONObject.toJSONString(rtnMap));
+                    }catch (Exception e){
+                        requestLogInfo.setReqInfo("ContentType is error,no find log!");
+                    }
 
-               }
-               //适配post json|xml类型请求，但URL包含参数的情况
-               if(contentType.contains("application/json") ||contentType.contains("application/xml")){
-                   try{
-                       postData.put("urlParam",JSONObject.toJSONString(rtnMap));
-                   }catch (Exception e){
-                       postData.put("urlParam","ContentType is error,no find log!");
-                   }
-               }
+                }
+                //适配post json|xml类型请求，但URL包含参数的情况
+                if(contentType.contains("application/json") ||contentType.contains("application/xml")){
+                    try{
+                        postData.put("urlParam",JSONObject.toJSONString(rtnMap));
+                    }catch (Exception e){
+                        postData.put("urlParam","ContentType is error,no find log!");
+                    }
+                }
             }
         }
 
@@ -214,7 +190,7 @@ public class RequestLogAspect {
                     for(int i=0;i< args.length;i++){
                         if(args[i] instanceof HttpServletRequest || args[i] instanceof HttpServletResponse
                                 ||rtnMap.containsKey(parameterNames[i])){
-                           continue;
+                            continue;
                         }
                         if(shanHaiLogConfig.getIgnoreRequestParams().contains(args[i].getClass().getName())){
                             continue;
@@ -237,41 +213,8 @@ public class RequestLogAspect {
             }
             requestLogInfo.setReqInfo(postData.toJSONString());
         }
-        try {
-            if(socLog.fileUpload()){
-                Collection<Part> parts= request.getParts();
-                if(parts!=null && parts.size()>0){
-                    Map<String, List<String>> fileReqInfo=new HashMap<>();
-                    for(Part p:parts){
-                        if(!StrUtil.isBlank(p.getSubmittedFileName())){
-                            String k=p.getName();
-                            List<String> files= fileReqInfo.get(k);
-                            if(files!=null){
-                                files.add(p.getSubmittedFileName());
-                                fileReqInfo.put(k,files);
-                            }else{
-                                files=new ArrayList<>();
-                                files.add(p.getSubmittedFileName());
-                                fileReqInfo.put(k,files);
-                            }
-                        }
-                    }
-                    if(fileReqInfo.keySet().size()>0){
-                        requestLogInfo.setFileReqInfo(JSONObject.toJSONString(fileReqInfo));
-                        requestLogInfo.setFileUploadRequest(true);
-                    }else{
-                        requestLogInfo.setFileUploadRequest(false);
-                        requestLogInfo.setFileReqInfo("-");
-                    }
-                }
-            }else{
-                requestLogInfo.setFileUploadRequest(false);
-                requestLogInfo.setFileReqInfo("-");
-            }
-        }catch (Exception e){
-            requestLogInfo.setFileUploadRequest(false);
-            requestLogInfo.setFileReqInfo("-");
-        }
+        requestLogInfo.setFileUploadRequest(false);
+        requestLogInfo.setFileReqInfo("-");
         if(StrUtil.isBlank(requestLogInfo.getReqInfo())){
             requestLogInfo.setReqInfo("-");
         }
@@ -287,31 +230,6 @@ public class RequestLogAspect {
         if (shanHaiLogConfig.isConsoleShow()) {
             Logger.info("[RequestLog]-{}", JSONObject.toJSONString(requestLogInfo));
         }
-    }
-
-    /**
-     * 解析SPEL
-     *
-     * @param message   含SPEL的日志消息
-     * @param joinPoint
-     * @return
-     */
-    private String executeTemplate(String message, JoinPoint joinPoint) {
-        try {
-            ExpressionParser parser = new SpelExpressionParser();
-            StandardReflectionParameterNameDiscoverer discoverer = new StandardReflectionParameterNameDiscoverer();
-            Method method = ((MethodSignature) joinPoint.getSignature()).getMethod();
-            String[] params = discoverer.getParameterNames(method);
-            Object[] args = joinPoint.getArgs();
-            EvaluationContext context = new StandardEvaluationContext();
-            for (int len = 0; len < Objects.requireNonNull(params).length; len++) {
-                context.setVariable(params[len], args[len]);
-            }
-            return parser.parseExpression(message, new TemplateParserContext()).getValue(context, String.class);
-        } catch (Exception e) {
-            Logger.error("[executeTemplate]-msg:{}", e.getMessage());
-        }
-        return message;
     }
     /**
      * 转换为MAP
@@ -333,5 +251,4 @@ public class RequestLogAspect {
         }
         return rtnMap;
     }
-
 }
