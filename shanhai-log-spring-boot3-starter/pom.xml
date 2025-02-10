@@ -11,6 +11,7 @@
     <artifactId>shanhai-log-spring-boot3-starter</artifactId>
     <version>1.0.0</version>
     <name>shanhai-log-spring-boot3-starter</name>
+    <url>https://github.com/SeeMountainSea/shanhai-log-spring-boot-starter</url>
     <description>山海Log - 一款基于SpringBoot3的业务日志记录组件</description>
     <properties>
         <spring-boot3.version>3.1.4</spring-boot3.version>

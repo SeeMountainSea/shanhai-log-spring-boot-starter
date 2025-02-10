@@ -8,6 +8,7 @@
     <version>1.1.4</version>
     <packaging>pom</packaging>
     <name>shanhai-log-parent</name>
+    <url>https://github.com/SeeMountainSea/shanhai-log-spring-boot-starter</url>
     <description>山海Log - 一款基于SpringBoot的业务日志记录组件</description>
     <properties>
         <hutool.version>5.8.34</hutool.version>
