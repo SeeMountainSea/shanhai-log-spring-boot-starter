@@ -285,8 +285,11 @@ public class RequestLogAspect {
         }else{
             requestLogInfo.setCost(-1L);
         }
-
-        requestLogService.saveLog(requestLogInfo);
+        if(socLog.dataMasking()){
+            requestLogService.saveLog(requestLogInfo,socLog.dataMaskingRule());
+        }else{
+            requestLogService.saveLog(requestLogInfo);
+        }
         if (shanHaiLogConfig.isConsoleShow()) {
             Logger.info("[RequestLog]-{}", JSONObject.toJSONString(requestLogInfo));
         }

@@ -47,4 +47,16 @@ public @interface RequestLog {
      * @return
      */
     boolean fileDownload() default false;
+
+    /**
+     * 报文脱敏
+     * @return
+     */
+    boolean dataMasking()  default false;
+
+    /**
+     * 数据脱敏规则
+     * @return
+     */
+    String dataMaskingRule() default "";
 }

@@ -28,4 +28,8 @@ public interface RequestLogService {
    * @return
    */
   public String getReqSourceIp(HttpServletRequest request);
+  /**
+   * 存储日志(日志需要脱敏)
+   */
+  default void saveLog(RequestLogInfo requestLogInfo,String dataMaskingRule){};
 }
