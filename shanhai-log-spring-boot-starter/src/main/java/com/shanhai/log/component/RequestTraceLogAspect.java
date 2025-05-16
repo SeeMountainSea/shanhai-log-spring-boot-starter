@@ -171,7 +171,7 @@ public class RequestTraceLogAspect {
                         try{
                             if(!shanHaiLogConfig.getIgnoreRequestParams().contains(args[0].getClass().getName())){
                                 if(!(args[0] instanceof HttpServletRequest || args[0] instanceof HttpServletResponse)){
-                                    postData.put("bodyParam",JSONObject.toJSONString(String.valueOf(args[0])));
+                                    postData.put("bodyParam",JSONObject.toJSONString(args[0]));
                                 }
                             }
                         }catch (Exception e){

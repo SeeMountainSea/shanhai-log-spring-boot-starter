@@ -30,7 +30,11 @@ public @interface RequestLog {
      * @return
      */
     String currentUser() default "";
-
+    /**
+     * 是否根据报文实现用户获取逻辑
+     * @return
+     */
+    boolean queryUserBySelf() default false;
     /**
      * 本次请求是否为文件上传请求
      * @return
@@ -47,6 +51,17 @@ public @interface RequestLog {
      * @return
      */
     boolean fileDownload() default false;
+
+    /**
+     * 本次请求是否启用文件下载日志
+     * @return
+     */
+    boolean fileDownloadLog() default false;
+    /**
+     * 文件下载日志处理规则
+     * @return
+     */
+    String fileDownloadLogRule() default "";
 
     /**
      * 报文脱敏

@@ -139,20 +139,16 @@ public class RequestLogAspect {
         } else {
             requestLogInfo.setMessage(socLog.message());
         }
-        if (socLog.currentUser().contains("#{")) {
-            requestLogInfo.setCurrentUser(executeTemplate(socLog.currentUser(), point));
-        } else {
-            requestLogInfo.setCurrentUser(requestLogService.getCurrentUser(request));
-        }
+
         if (respContent != null) {
-            if(!socLog.fileDownload()){
+            if(socLog.fileDownload()||socLog.ignoreResponse()){
+                requestLogInfo.setRespInfo("Ignore response");
+            }else{
                 try{
                     requestLogInfo.setRespInfo(JSONUtil.toJsonStr(respContent));
                 }catch (Exception e){
                     requestLogInfo.setRespInfo(String.valueOf(respContent));
                 }
-            }else{
-                requestLogInfo.setRespInfo("File Download");
             }
             requestLogInfo.setRespStatusCode(200);
         }
@@ -197,7 +193,7 @@ public class RequestLogAspect {
                         try{
                             if(!shanHaiLogConfig.getIgnoreRequestParams().contains(args[0].getClass().getName())){
                                 if(!(args[0] instanceof HttpServletRequest || args[0] instanceof HttpServletResponse)){
-                                    postData.put("bodyParam",JSONObject.toJSONString(String.valueOf(args[0])));
+                                    postData.put("bodyParam",JSONObject.toJSONString(args[0]));
                                 }
                             }
                         }catch (Exception e){
@@ -274,6 +270,15 @@ public class RequestLogAspect {
             requestLogInfo.setFileUploadRequest(false);
             requestLogInfo.setFileReqInfo("-");
         }
+        try{
+            if(socLog.fileDownload()&&socLog.fileDownloadLog()){
+                requestLogInfo.setFileDownloadRequest(true);
+                requestLogInfo.setFileDownloadInfo(requestLogService.getFileDownLoadLog(requestLogInfo,socLog.fileDownloadLogRule()));
+            }
+        }catch (Exception e){
+            requestLogInfo.setFileDownloadRequest(false);
+            requestLogInfo.setFileDownloadInfo("-");
+        }
         if(StrUtil.isBlank(requestLogInfo.getReqInfo())){
             requestLogInfo.setReqInfo("-");
         }
@@ -284,6 +289,15 @@ public class RequestLogAspect {
                     requestLogInfo.getRespTime(), DateUnit.MS));
         }else{
             requestLogInfo.setCost(-1L);
+        }
+        if (socLog.currentUser().contains("#{")) {
+            requestLogInfo.setCurrentUser(executeTemplate(socLog.currentUser(), point));
+        } else {
+            if(socLog.queryUserBySelf()){
+                requestLogInfo.setCurrentUser(requestLogService.getCurrentUser(requestLogInfo));
+            }else{
+                requestLogInfo.setCurrentUser(requestLogService.getCurrentUser(request));
+            }
         }
         if(socLog.dataMasking()){
             requestLogService.saveLog(requestLogInfo,socLog.dataMaskingRule());

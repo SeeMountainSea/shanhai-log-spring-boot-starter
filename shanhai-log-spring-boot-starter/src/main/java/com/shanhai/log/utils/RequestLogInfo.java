@@ -41,14 +41,14 @@ public class RequestLogInfo implements Serializable {
     /**
      * 请求开始时间
      */
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss.SSS")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss.SSS")
     private Date reqTime;
     /**
      * 请求结束时间
      */
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss.SSS")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss.SSS")
     private Date respTime;
 
     /**
@@ -103,4 +103,12 @@ public class RequestLogInfo implements Serializable {
      * 接口调用时长
      */
     private Long cost;
+    /**
+     * 是否为文件下载请求
+     */
+    private Boolean fileDownloadRequest;
+    /**
+     * 文件下载清单
+     */
+    private String fileDownloadInfo;
 }

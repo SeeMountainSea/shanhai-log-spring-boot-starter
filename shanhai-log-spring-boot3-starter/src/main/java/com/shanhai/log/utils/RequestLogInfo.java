@@ -13,6 +13,7 @@ import java.util.Map;
 
 /**
  * 标准化操作日志
+ * @author log
  */
 @Data
 @NoArgsConstructor
@@ -41,14 +42,14 @@ public class RequestLogInfo implements Serializable {
     /**
      * 请求开始时间
      */
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss.SSS")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss.SSS")
     private Date reqTime;
     /**
      * 请求结束时间
      */
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
-    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss.SSS")
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss.SSS")
     private Date respTime;
 
     /**
@@ -88,13 +89,21 @@ public class RequestLogInfo implements Serializable {
      */
     private String contentType;
     /**
-     * 是否未上传文件请求
+     * 是否为上传文件请求
      */
     private Boolean fileUploadRequest;
     /**
      * 文件上传清单
      */
     private String fileReqInfo;
+    /**
+     * 是否为文件下载请求
+     */
+    private Boolean fileDownloadRequest;
+    /**
+     * 文件下载清单
+     */
+    private String fileDownloadInfo;
     /**
      * 自定义扩展日志信息
      */
