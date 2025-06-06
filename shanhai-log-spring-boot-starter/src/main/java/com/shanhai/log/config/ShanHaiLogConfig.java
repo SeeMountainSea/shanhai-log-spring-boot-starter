@@ -20,7 +20,7 @@ import java.util.List;
 @ConfigurationProperties(prefix = "shanhai.log")
 public class ShanHaiLogConfig {
     /**
-     * 是否启用组件
+     * 是否启用控制台打印
      */
     private boolean consoleShow=false;
     /**
@@ -32,11 +32,11 @@ public class ShanHaiLogConfig {
      */
     private List<String> ignoreRequestUri=new ArrayList<>();
     /**
-     * 启用山海Log
+     * 启用请求报文JSON格式化
      */
-    private boolean shanhaiLogStatus=true;
+    private boolean reqJsonPrettyFormat=false;
     /**
-     * 启用全局跟踪Log
+     * 启用请求报文JSON格式化
      */
-    private boolean shanhaiTraceLogStatus=true;
+    private boolean respJsonPrettyFormat=false;
 }

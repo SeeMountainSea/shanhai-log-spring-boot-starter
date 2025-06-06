@@ -1,6 +1,7 @@
 package com.shanhai.log.utils;
 
 import com.alibaba.fastjson.annotation.JSONField;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,7 @@ import java.util.Map;
 
 /**
  * 标准化操作日志
+ * @author shanhai
  */
 @Data
 @NoArgsConstructor
@@ -70,11 +72,18 @@ public class RequestLogInfo implements Serializable {
      * 请求报文
      */
     private String reqInfo;
-
+    /**
+     * 请求报文美化版本（开启respJsonPrettyFormat可用）
+     */
+    private JsonNode reqInfoPretty;
     /**
      * 响应报文
      */
     private String respInfo;
+    /**
+     * 响应报文美化版本（开启reqJsonPrettyFormat可用）
+     */
+    private JsonNode respInfoPretty;
     /**
      * 响应状态码
      */
@@ -95,6 +104,10 @@ public class RequestLogInfo implements Serializable {
      * 文件上传清单
      */
     private String fileReqInfo;
+    /**
+     * 文件上传清单美化版本（开启reqJsonPrettyFormat可用）
+     */
+    private JsonNode fileReqInfoPretty;
     /**
      * 自定义扩展日志信息
      */

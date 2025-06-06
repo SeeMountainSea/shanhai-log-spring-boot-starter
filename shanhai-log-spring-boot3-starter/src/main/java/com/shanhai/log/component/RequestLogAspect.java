@@ -9,6 +9,7 @@ import com.shanhai.log.annotation.RequestLog;
 import com.shanhai.log.config.ShanHaiLogConfig;
 import com.shanhai.log.service.RequestLogService;
 import com.shanhai.log.service.impl.DefaultRequestLogService;
+import com.shanhai.log.utils.JsonUnescapeUtil;
 import com.shanhai.log.utils.Logger;
 import com.shanhai.log.utils.RequestLogInfo;
 import jakarta.servlet.http.HttpServletRequest;
@@ -146,6 +147,9 @@ public class RequestLogAspect {
             }else{
                 try{
                     requestLogInfo.setRespInfo(JSONUtil.toJsonStr(respContent));
+                    if(shanHaiLogConfig.isRespJsonPrettyFormat()){
+                        requestLogInfo.setRespInfoPretty(JsonUnescapeUtil.parseNestedJson(requestLogInfo.getRespInfo()));
+                    }
                 }catch (Exception e){
                     requestLogInfo.setRespInfo(String.valueOf(respContent));
                 }
@@ -163,21 +167,31 @@ public class RequestLogAspect {
         JSONObject postData=new JSONObject();
         if(rtnMap.size()>0){
             if("GET".equals(request.getMethod())){
-                requestLogInfo.setReqInfo(JSONObject.toJSONString(rtnMap));
+                try {
+                    requestLogInfo.setReqInfo(JSONObject.toJSONString(rtnMap));
+                    if(shanHaiLogConfig.isReqJsonPrettyFormat()){
+                        requestLogInfo.setReqInfoPretty(JsonUnescapeUtil.parseNestedJson(requestLogInfo.getReqInfo()));
+                    }
+                }catch (Exception e){
+                    requestLogInfo.setReqInfo("json format exception,source:"+rtnMap);
+                }
             }
             if("POST".equals(request.getMethod())){
                if(contentType.contains("multipart/form-data") ||contentType.contains("application/x-www-form-urlencoded")){
                    try{
                        requestLogInfo.setReqInfo(JSONObject.toJSONString(rtnMap));
+                       if(shanHaiLogConfig.isReqJsonPrettyFormat()){
+                           requestLogInfo.setReqInfoPretty(JsonUnescapeUtil.parseNestedJson(requestLogInfo.getReqInfo()));
+                       }
                    }catch (Exception e){
-                       requestLogInfo.setReqInfo("ContentType is error,no find log!");
+                       requestLogInfo.setReqInfo("json format exception,source:"+rtnMap);
                    }
 
                }
                //适配post json|xml类型请求，但URL包含参数的情况
                if(contentType.contains("application/json") ||contentType.contains("application/xml")){
                    try{
-                       postData.put("urlParam",JSONObject.toJSONString(rtnMap));
+                       postData.put("urlParam",JSONObject.parseObject(JSONObject.toJSONString(rtnMap)));
                    }catch (Exception e){
                        postData.put("urlParam","ContentType is error,no find log!");
                    }
@@ -193,7 +207,7 @@ public class RequestLogAspect {
                         try{
                             if(!shanHaiLogConfig.getIgnoreRequestParams().contains(args[0].getClass().getName())){
                                 if(!(args[0] instanceof HttpServletRequest || args[0] instanceof HttpServletResponse)){
-                                    postData.put("bodyParam",JSONObject.toJSONString(args[0]));
+                                    postData.put("bodyParam",JSONObject.parseObject(JSONObject.toJSONString(args[0])));
                                 }
                             }
                         }catch (Exception e){
@@ -221,7 +235,7 @@ public class RequestLogAspect {
                     }
                     if(contentType.contains("application/json")){
                         try{
-                            postData.put("bodyParam",JSONObject.toJSONString(bodyParams));
+                            postData.put("bodyParam",JSONObject.parseObject(JSONObject.toJSONString(bodyParams)));
                         }catch (Exception e){
                             postData.put("bodyParam","ContentType is error,no find log!");
                         }
@@ -234,6 +248,13 @@ public class RequestLogAspect {
                 postData.put("bodyParam","-");
             }
             requestLogInfo.setReqInfo(postData.toJSONString());
+            try{
+                if(shanHaiLogConfig.isReqJsonPrettyFormat()){
+                    requestLogInfo.setReqInfoPretty(JsonUnescapeUtil.parseNestedJson(requestLogInfo.getReqInfo()));
+                }
+            }catch (Exception e){
+                Logger.error("json format exception,source:"+requestLogInfo.getReqInfo());
+            }
         }
         try {
             if(socLog.fileUpload()){
@@ -256,6 +277,13 @@ public class RequestLogAspect {
                     }
                     if(fileReqInfo.keySet().size()>0){
                         requestLogInfo.setFileReqInfo(JSONObject.toJSONString(fileReqInfo));
+                        try{
+                            if(shanHaiLogConfig.isReqJsonPrettyFormat()){
+                                requestLogInfo.setFileReqInfoPretty(JsonUnescapeUtil.parseNestedJson(requestLogInfo.getFileReqInfo()));
+                            }
+                        }catch (Exception e){
+                            Logger.error("json format exception,source:"+fileReqInfo);
+                        }
                         requestLogInfo.setFileUploadRequest(true);
                     }else{
                         requestLogInfo.setFileUploadRequest(false);

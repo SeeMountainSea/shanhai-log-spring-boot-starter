@@ -7,3 +7,5 @@ shanhai:
     consoleShow: true
     ignore-request-params:
       - cn.hutool.system.UserInfo
+    req-json-pretty-format: true
+    resp-json-pretty-format: true
