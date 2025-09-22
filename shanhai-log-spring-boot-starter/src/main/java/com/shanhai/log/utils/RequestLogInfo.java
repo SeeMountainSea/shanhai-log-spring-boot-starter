@@ -109,10 +109,6 @@ public class RequestLogInfo implements Serializable {
      */
     private JsonNode fileReqInfoPretty;
     /**
-     * 自定义扩展日志信息
-     */
-    private Map<String,Object> extLogInfo;
-    /**
      * 接口调用时长
      */
     private Long cost;
@@ -124,4 +120,16 @@ public class RequestLogInfo implements Serializable {
      * 文件下载清单
      */
     private String fileDownloadInfo;
+    /**
+     * 服务器节点标识
+     */
+    private String serverNode;
+    /**
+     * 用户日志保护标识
+     */
+    private String userGuardFlag;
+    /**
+     * 自定义扩展日志信息
+     */
+    private Map<String,Object> extLogInfo;
 }

@@ -29,7 +29,7 @@
         <dependency>
             <groupId>com.wangshanhai.log</groupId>
             <artifactId>shanhai-log-spring-boot3-starter</artifactId>
-            <version>1.0.4</version>
+            <version>1.0.5</version>
         </dependency>
     </dependencies>
 </project>

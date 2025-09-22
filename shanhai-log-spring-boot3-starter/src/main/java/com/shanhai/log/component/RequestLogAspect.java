@@ -2,6 +2,7 @@ package com.shanhai.log.component;
 
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.text.AntPathMatcher;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
@@ -86,7 +87,8 @@ public class RequestLogAspect {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         assert requestAttributes != null;
         HttpServletRequest request = requestAttributes.getRequest();
-        if(shanHaiLogConfig.getIgnoreRequestUri().contains(request.getRequestURI())){
+        AntPathMatcher pathMatcher = new AntPathMatcher();
+        if(shanHaiLogConfig.getIgnoreRequestUri().stream().anyMatch(blackPattern -> pathMatcher.match(blackPattern,request.getRequestURI()))){
             return result;
         }
         long endTime = System.currentTimeMillis();
@@ -327,6 +329,8 @@ public class RequestLogAspect {
                 requestLogInfo.setCurrentUser(requestLogService.getCurrentUser(request));
             }
         }
+        requestLogInfo.setUserGuardFlag(requestLogService.getCurrentUserGuardFlag(request,requestLogInfo));
+        requestLogInfo.setServerNode(requestLogService.getCurrentServerNodeFlag(request));
         if(socLog.dataMasking()){
             requestLogService.saveLog(requestLogInfo,socLog.dataMaskingRule());
         }else{

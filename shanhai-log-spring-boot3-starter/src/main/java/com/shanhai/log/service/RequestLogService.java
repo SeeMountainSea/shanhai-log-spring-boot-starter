@@ -43,9 +43,20 @@ public interface RequestLogService {
    * @return
    */
   public String getReqSourceIp(HttpServletRequest request);
-
   /**
    * 存储日志(日志需要脱敏)
    */
   default void saveLog(RequestLogInfo requestLogInfo,String dataMaskingRule){};
+  /**
+   * 用户审计保护标识（适应BMB三员独立审计场景）
+   * @param request
+   * @return
+   */
+  default String getCurrentUserGuardFlag(HttpServletRequest request,RequestLogInfo requestLogInfo){ return "-";};
+  /**
+   * 服务运行节点标识（适应Docker环境获取标识）
+   * @param request
+   * @return
+   */
+  default String getCurrentServerNodeFlag(HttpServletRequest request){ return "-";};
 }
