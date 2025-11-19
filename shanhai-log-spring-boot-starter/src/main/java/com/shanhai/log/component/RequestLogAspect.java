@@ -8,8 +8,11 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson.JSONObject;
 import com.shanhai.log.annotation.RequestLog;
 import com.shanhai.log.config.ShanHaiLogConfig;
+import com.shanhai.log.diff.DiffItem;
+import com.shanhai.log.diff.ObjectDiffComparator;
 import com.shanhai.log.service.RequestLogService;
 import com.shanhai.log.service.impl.DefaultRequestLogService;
+import com.shanhai.log.diff.HttpDiffResponse;
 import com.shanhai.log.utils.JsonUnescapeUtil;
 import com.shanhai.log.utils.Logger;
 import com.shanhai.log.utils.RequestLogInfo;
@@ -93,6 +96,11 @@ public class RequestLogAspect {
         long endTime = System.currentTimeMillis();
         if(result!=null){
             buildLog(joinPoint, beginTime, endTime, result, null);
+            if(result instanceof HttpDiffResponse){
+                if(shanHaiLogConfig.isOverrideHttpDiffResponse()){
+                    return requestLogService.getOverrideHttpDiffResponse(result);
+                }
+            }
         }else{
             buildLog(joinPoint, beginTime, endTime, "StreamReq is not record ResponseContent", null);
         }
@@ -329,8 +337,18 @@ public class RequestLogAspect {
                 requestLogInfo.setCurrentUser(requestLogService.getCurrentUser(request));
             }
         }
-        requestLogInfo.setUserGuardFlag(requestLogService.getCurrentUserGuardFlag(request,requestLogInfo));
+        requestLogInfo.setUserGuardFlag(socLog.bmbLevel());
         requestLogInfo.setServerNode(requestLogService.getCurrentServerNodeFlag(request));
+        if(respContent instanceof HttpDiffResponse&&socLog.diffData()){
+            try{
+                HttpDiffResponse result=(HttpDiffResponse)respContent;
+                List<DiffItem> diffs = ObjectDiffComparator.compare(result.getSourceData(),  result.getTargetData());
+                requestLogInfo.setDiffContent(JSONObject.toJSONString(diffs));
+            }catch (Exception e){
+                requestLogInfo.setDiffContent("diff check error,msg:"+e.getMessage());
+                e.printStackTrace();
+            }
+        }
         if(socLog.dataMasking()){
             requestLogService.saveLog(requestLogInfo,socLog.dataMaskingRule());
         }else{

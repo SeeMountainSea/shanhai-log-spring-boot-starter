@@ -39,4 +39,8 @@ public class ShanHaiLogConfig {
      * 启用请求报文JSON格式化
      */
     private boolean respJsonPrettyFormat=false;
+    /**
+     * 重写HttpDiffResponse响应内容
+     */
+    private boolean overrideHttpDiffResponse=false;
 }

@@ -1,5 +1,8 @@
 package com.shanhai.log.annotation;
 
+import com.shanhai.log.utils.BmBLevel;
+import com.shanhai.log.utils.LogsLevel;
+
 import java.lang.annotation.*;
 
 /**
@@ -16,11 +19,10 @@ public @interface RequestLog {
      */
     String module() default "";
     /**
-     * 接口级别 (用户级/系统级)
-     * sys-biz 系统级
-     * user-biz 用户级
+     * 日志级别
+     * @see LogsLevel
      */
-    String level() default "sys-biz";
+    String level() default LogsLevel.DATA_QUERY_OPERATE;
     /**
      * 日志内容
      */
@@ -74,4 +76,16 @@ public @interface RequestLog {
      * @return
      */
     String dataMaskingRule() default "";
+    /**
+     * BMB日志级别
+     * @see BmBLevel
+     * @return
+     */
+    String bmbLevel() default BmBLevel.SYS_USER;
+
+    /**
+     * 是否启用数据差异比对
+     * @return
+     */
+    boolean diffData() default false;
 }

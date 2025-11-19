@@ -129,6 +129,10 @@ public class RequestLogInfo implements Serializable {
      */
     private String userGuardFlag;
     /**
+     * 数据变化内容
+     */
+    private String diffContent;
+    /**
      * 自定义扩展日志信息
      */
     private Map<String,Object> extLogInfo;
