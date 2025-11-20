@@ -2,6 +2,7 @@ package com.shanhai.log.utils;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.shanhai.log.diff.DiffItem;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,6 +11,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -131,7 +133,7 @@ public class RequestLogInfo implements Serializable {
     /**
      * 数据变化内容
      */
-    private String diffContent;
+    private List<DiffItem> diffItems;
     /**
      * 自定义扩展日志信息
      */

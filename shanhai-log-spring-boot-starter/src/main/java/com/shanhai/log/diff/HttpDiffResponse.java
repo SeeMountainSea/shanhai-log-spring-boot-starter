@@ -64,7 +64,7 @@ public class HttpDiffResponse implements Serializable {
      * 原始Data
      */
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Object respData;
+    private Object data;
 
     public HttpDiffResponse() {
         this.code="200";
@@ -79,7 +79,7 @@ public class HttpDiffResponse implements Serializable {
         result.setMessage(message);
         result.setSourceData(sourceData);
         result.setTargetData(targetData);
-        result.setRespData(respData);
+        result.setData(respData);
         return result;
     }
 }
