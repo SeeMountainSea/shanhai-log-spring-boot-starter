@@ -344,6 +344,7 @@ public class RequestLogAspect {
                 HttpDiffResponse result=(HttpDiffResponse)respContent;
                 List<DiffItem> diffs = ObjectDiffComparator.compare(result.getSourceData(),  result.getTargetData());
                 requestLogInfo.setDiffContent(JSONObject.toJSONString(diffs));
+                requestLogInfo.setRespInfo(JSONObject.toJSONString(result));
             }catch (Exception e){
                 requestLogInfo.setDiffContent("diff check error,msg:"+e.getMessage());
                 e.printStackTrace();

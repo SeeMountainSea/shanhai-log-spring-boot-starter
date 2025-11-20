@@ -25,22 +25,21 @@
 
 package com.shanhai.log.diff;
 
-import java.util.ArrayList;
-import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * 差异项
  * @author Shanhai
  */
+@Getter
+@Setter
 public class DiffItem {
     private String fieldName;
     private String fieldDescription;
     private Object sourceValue;
     private Object targetValue;
     private DiffType diffType;
-    // 嵌套差异
-    private List<DiffItem> nestedDiffs;
-
     public enum DiffType {
         // 新增
         ADDED,
@@ -59,28 +58,7 @@ public class DiffItem {
         this.sourceValue  = sourceValue;
         this.targetValue  = targetValue;
         this.diffType  = diffType;
-        this.nestedDiffs  = new ArrayList<>();
     }
-
-    // Getters and Setters
-    public String getFieldName() { return fieldName; }
-    public void setFieldName(String fieldName) { this.fieldName  = fieldName; }
-
-    public String getFieldDescription() { return fieldDescription; }
-    public void setFieldDescription(String fieldDescription) { this.fieldDescription  = fieldDescription; }
-
-    public Object getSourceValue() { return sourceValue; }
-    public void setSourceValue(Object sourceValue) { this.sourceValue  = sourceValue; }
-
-    public Object getTargetValue() { return targetValue; }
-    public void setTargetValue(Object targetValue) { this.targetValue  = targetValue; }
-
-    public DiffType getDiffType() { return diffType; }
-    public void setDiffType(DiffType diffType) { this.diffType  = diffType; }
-
-    public List<DiffItem> getNestedDiffs() { return nestedDiffs; }
-    public void addNestedDiff(DiffItem diffItem) { this.nestedDiffs.add(diffItem);  }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -97,10 +75,6 @@ public class DiffItem {
             sb.append(",  newValue=").append(targetValue);
         } else if (diffType == DiffType.REMOVED) {
             sb.append(",  oldValue=").append(sourceValue);
-        }
-
-        if (!nestedDiffs.isEmpty())  {
-            sb.append(",  nestedDiffs=").append(nestedDiffs);
         }
         sb.append('}');
         return sb.toString();

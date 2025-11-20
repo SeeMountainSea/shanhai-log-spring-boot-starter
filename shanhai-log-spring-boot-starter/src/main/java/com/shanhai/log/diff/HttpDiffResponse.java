@@ -26,6 +26,7 @@
 package com.shanhai.log.diff;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -59,18 +60,26 @@ public class HttpDiffResponse implements Serializable {
      */
     @JsonIgnore
     private Object targetData;
+    /**
+     * 原始Data
+     */
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Object respData;
 
     public HttpDiffResponse() {
         this.code="200";
         this.message="success";
     }
-
-    public static <T> HttpDiffResponse resp(String code, String message, Object sourceData, Object targetData) {
+    public static HttpDiffResponse resp(String code, String message, Object sourceData, Object targetData){
+       return  resp(code,message,sourceData,targetData,null);
+    }
+    public static HttpDiffResponse resp(String code, String message, Object sourceData, Object targetData,Object respData) {
         HttpDiffResponse result = new HttpDiffResponse();
         result.setCode(code);
         result.setMessage(message);
         result.setSourceData(sourceData);
         result.setTargetData(targetData);
+        result.setRespData(respData);
         return result;
     }
 }

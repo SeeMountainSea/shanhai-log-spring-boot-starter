@@ -46,9 +46,4 @@ public @interface DiffField{
      * 是否参与对比
      */
     boolean compare() default true;
-
-    /**
-     * 是否深度对比（对于集合和复杂对象）
-     */
-    boolean deepCompare() default true;
 }
