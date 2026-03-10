@@ -186,16 +186,22 @@ public class RequestTraceLogAspect {
                     }
                 }else{
                     Map<String,Object> bodyParams=new HashMap<>();
-                    String[] parameterNames=  ((MethodSignature) point.getSignature()).getParameterNames();
-                    for(int i=0;i< args.length;i++){
-                        if(args[i] instanceof HttpServletRequest || args[i] instanceof HttpServletResponse
-                                ||rtnMap.containsKey(parameterNames[i])){
-                            continue;
+                    MethodSignature methodSignature = (MethodSignature) point.getSignature();
+                    String[] parameterNames= methodSignature==null?new String[]{}:methodSignature.getParameterNames();
+                    if(parameterNames==null){
+                        parameterNames=new String[]{};
+                    }
+                    if(parameterNames.length==args.length){
+                        for(int i=0;i< args.length;i++){
+                            if(args[i] instanceof HttpServletRequest || args[i] instanceof HttpServletResponse
+                                    ||rtnMap.containsKey(parameterNames[i])){
+                                continue;
+                            }
+                            if(shanHaiLogConfig.getIgnoreRequestParams().contains(args[i].getClass().getName())){
+                                continue;
+                            }
+                            bodyParams.put(parameterNames[i],args[i]);
                         }
-                        if(shanHaiLogConfig.getIgnoreRequestParams().contains(args[i].getClass().getName())){
-                            continue;
-                        }
-                        bodyParams.put(parameterNames[i],args[i]);
                     }
                     if(contentType.contains("application/json")){
                         try{
