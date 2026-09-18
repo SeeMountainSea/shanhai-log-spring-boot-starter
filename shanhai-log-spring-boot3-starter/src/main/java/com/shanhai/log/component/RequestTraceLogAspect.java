@@ -191,6 +191,9 @@ public class RequestTraceLogAspect {
                     if(parameterNames==null){
                         parameterNames=new String[]{};
                     }
+                    if(parameterNames.length!=args.length){
+                        bodyParams.put("compiler-args-error","Please Add -parameters When Use JDK17+ compiler");
+                    }
                     if(parameterNames.length==args.length){
                         for(int i=0;i< args.length;i++){
                             if(args[i] instanceof HttpServletRequest || args[i] instanceof HttpServletResponse
