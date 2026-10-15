@@ -46,4 +46,14 @@ public class LogController {
         manyParamService.test("参数首位",body);
         return "success";
     }
+
+    @RequestLog(module = "Order", message = "多入参测试")
+    @RequestMapping(value = "/manyHeader")
+    @ResponseBody
+    public String manyHeader(@RequestHeader(name = "flag",required = false)  String flag,
+                             @RequestBody String body, UserInfo userInfo,
+                             HttpServletRequest request,HttpServletResponse response){
+        manyParamService.test("参数首位",body);
+        return "success";
+    }
 }

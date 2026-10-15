@@ -242,6 +242,10 @@ public class RequestLogAspect {
                                     ||rtnMap.containsKey(parameterNames[i])){
                                 continue;
                             }
+                            if(args[i]==null){
+                                bodyParams.put(parameterNames[i],null);
+                                continue;
+                            }
                             if(shanHaiLogConfig.getIgnoreRequestParams().contains(args[i].getClass().getName())){
                                 continue;
                             }
