@@ -31,7 +31,7 @@
 
     <developers>
         <developer>
-            <name>shmily_zgs</name>
+            <name>SeeMountainSea</name>
             <email>gold.robot@88.com</email>
             <url>https://github.com/SeeMountainSea/shanhai-log-spring-boot-starter</url>
         </developer>
@@ -76,7 +76,7 @@
                     <plugin>
                         <groupId>org.sonatype.central</groupId>
                         <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.8.0</version>
+                        <version>0.12.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <publishingServerId>central</publishingServerId>
